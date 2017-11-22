@@ -17,7 +17,7 @@ client.on("error", function (err) {
 });
 
 client.on("subscribe", (channel) => {
-    // if(channel !== config.channelName[ENV]) return;
+    if(channel !== config.channelName[ENV]) return;
     // Check if generator exists
     console.log(`Subscribe client #${clientNumber}`);
 
