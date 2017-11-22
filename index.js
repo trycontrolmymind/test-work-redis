@@ -3,39 +3,29 @@
  */
 const config = require('./config'),
     ENV = process.env.NODE_ENV;
-const redis = require("redis"),
-    client = redis.createClient(config.redisPort[ENV]);
-const lorem = require("lorem-ipsum"),
-    loremDefaults = {count: 3, units: "words"};
-const clientNumber = Math.round(Math.random() * 10000);
+const redis = require("redis");
+const client = redis.createClient(config.redisPort[ENV]);
+const generatorMode = require("./generatorMode");
+const errorHandler = require("./errorHandler");
 
 // If args is "getErrors" pop all messages
 // Print Errors and exit
 
-client.on("error", function (err) {
-    // Add error to DB
-});
+client.on("error", errorHandler);
 
-client.on("subscribe", (channel) => {
-    if(channel !== config.channelName[ENV]) return;
-    // Check if generator exists
-    console.log(`Subscribe client #${clientNumber}`);
-
-    client.get("message-generator", (err, reply) => {
-        if (err) {
-            // Start generator mode
-        }
-        if (typeof reply === 'number' && (reply % 1) === 0) {
-            // Start generator mode
-        }
-        // Check if generator keep alive
-        let currentTimestamp = +new Date();
-        if (currentTimestamp - reply > config.messagePerMs[ENV]) {
-            // Start generator mode
-        } else {
-            // Start worker mode
-        }
-    });
+client.get("message-generator", (err, reply) => {
+    // If has error, don't stop
+    if (err) errorHandler(err);
+    // If no reply OR keepalive signal was 500*2ms ago
+    if (reply === null ||
+        (typeof reply === 'number' && (reply % 1) === 0) ||
+        (+new Date() - reply > config.messagePerMs[ENV] * 2)) {
+        // Start generator mode
+        generatorMode.start();
+    } else {
+        // Start worker mode
+    }
+    client.quit();
 });
 
 // Join channel to isolate
