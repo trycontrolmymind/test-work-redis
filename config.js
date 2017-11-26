@@ -6,7 +6,7 @@ module.exports = {
         "dev": 500
     },
     keepAliveTimeout: {
-        "dev": 500 * 2
+        "dev": 500 * 5
     },
     channelName: {
         "dev": "application-channel"

@@ -10,11 +10,13 @@ const generatorMode = require("./generatorMode"),
     CommonClient = require("./commonClient"),
     WorkerMode = require("./workerMode");
 
-const myClient = new CommonClient();
+const commonClient = new CommonClient();
 
 // Send keepalive messages to know, what client's is online now
-setInterval(function () {
-    myClient.sendKeepalive();
+commonClient.sendKeepalive();
+let timerId = setTimeout(function tick() {
+    commonClient.sendKeepalive();
+    timerId = setTimeout(tick, config.keepAliveTimeout[ENV]);
 }, config.keepAliveTimeout[ENV]);
 
 const worker = new WorkerMode(onNoMessages);
@@ -22,7 +24,12 @@ const worker = new WorkerMode(onNoMessages);
 function onNoMessages(timeout) {
     console.log(`No message's from generator after ${timeout}ms`);
     // Get all client's online
+    commonClient.getAllClientsOnline(function (reply) {
+        const newGeneratorId = commonClient.getNewGenerator(reply);
+        console.log(`New generator will be #${newGeneratorId}`);
+    });
     // Make new generator from the elder client
+    // Make listener's from other client's
 }
 
 client.subscribe(config.channelName[ENV]);
