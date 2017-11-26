@@ -15,7 +15,7 @@ const myClient = new CommonClient();
 // Send keepalive messages to know, what client's is online now
 setInterval(function () {
     myClient.sendKeepalive();
-}, 2000);
+}, config.keepAliveTimeout[ENV]);
 
 const worker = new WorkerMode(onNoMessages);
 

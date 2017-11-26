@@ -2,9 +2,11 @@ const config = require('./config'),
     ENV = process.env.NODE_ENV;
 const redis = require("redis");
 const errorHandler = require("./errorHandler");
+
 class Client {
     constructor() {
         this._clientNumber = Client.getRandomInt();
+        console.log(`Client #${this.clientNumber} logged in`);
     }
 
     get clientNumber() {
