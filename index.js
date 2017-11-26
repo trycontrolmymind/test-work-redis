@@ -19,7 +19,7 @@ let timerId = setTimeout(function tick() {
     timerId = setTimeout(tick, config.keepAliveTimeout[ENV]);
 }, config.keepAliveTimeout[ENV]);
 
-const worker = new WorkerMode(onNoMessages);
+let worker = new WorkerMode(onNoMessages);
 
 function onNoMessages(timeout) {
     console.log(`No message's from generator after ${timeout}ms`);
@@ -27,9 +27,20 @@ function onNoMessages(timeout) {
     commonClient.getAllClientsOnline(function (reply) {
         const newGeneratorId = commonClient.getNewGenerator(reply);
         console.log(`New generator will be #${newGeneratorId}`);
+        startGeneratorOrWorker(newGeneratorId);
     });
-    // Make new generator from the elder client
-    // Make listener's from other client's
+
+    function startGeneratorOrWorker(generatorId) {
+        // Make new generator from the elder client
+        // Make listener's from other client's
+        if (generatorId === commonClient.clientNumber) {
+            generatorMode.start(commonClient.clientNumber, function () {
+                worker = new WorkerMode(onNoMessages);
+            });
+        } else {
+            worker = new WorkerMode(onNoMessages);
+        }
+    }
 }
 
 client.subscribe(config.channelName[ENV]);
