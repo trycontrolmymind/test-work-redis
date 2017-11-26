@@ -5,28 +5,24 @@ const config = require('./config'),
     ENV = process.env.NODE_ENV;
 const redis = require("redis");
 const client = redis.createClient(config.redisPort[ENV]);
-const generatorMode = require("./generatorMode");
 const errorHandler = require("./errorHandler");
+const generatorMode = require("./generatorMode"),
+    CommonClient = require("./commonClient");
+const async = require("async");
 
-// If args is "getErrors" pop all messages
-// Print Errors and exit
+const myClient = new CommonClient();
+const clientNumber = CommonClient.getRandomInt();
+// On register new client
+// { clientNumber: heartbeat timestamp }
 
-client.on("error", errorHandler);
-
-client.get("message-generator", (err, reply) => {
-    // If has error, don't stop
-    if (err) errorHandler(err);
-    // If no reply OR keepalive signal was 500*2ms ago
-    if (reply === null ||
-        (typeof reply === 'number' && (reply % 1) === 0) ||
-        (+new Date() - reply > config.messagePerMs[ENV] * 2)) {
-        // Start generator mode
-        generatorMode.start();
-    } else {
-        // Start worker mode
-    }
-    client.quit();
+client.on("connect", function () {
 });
 
-// Join channel to isolate
+// Send keepalive messages to know, what client's is online now
+setInterval(function () {
+    myClient.sendKeepalive();
+}, 2000);
+
 client.subscribe(config.channelName[ENV]);
+
+client.on("error", errorHandler);

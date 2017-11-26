@@ -5,6 +5,9 @@ module.exports = {
     messagePerMs: {
         "dev": 500
     },
+    keepAliveTimeout: {
+        "dev": 500 * 2
+    },
     channelName: {
         "dev": "application-channel"
     }
