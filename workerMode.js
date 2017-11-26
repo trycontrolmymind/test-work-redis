@@ -7,11 +7,12 @@ const redis = require("redis");
 const errorHandler = require("./errorHandler");
 
 class Worker {
-    constructor(onNoMsgCallback) {
+    constructor(onNoMsgCallback, clientId) {
         this.client = redis.createClient(config.redisPort[ENV]);
         this._latestMsgTime = +Date.now();
         this.onNoMsgCallback = onNoMsgCallback ? onNoMsgCallback : function () {
         };
+        this.clientId = clientId;
         this.client.subscribe(config.channelName[ENV]);
         this._checkMessages();
         this._onMessage();
@@ -31,16 +32,31 @@ class Worker {
 
     _onMessage() {
         this.client.on("message", (channel, message) => {
-            this._latestMsgTime = +Date.now();
-            let d = Math.random();
-            // 5% to error
-            if (d < 0.05) {
-                console.error(message);
-                this._writeError(message);
-            }
-            console.log(message);
-            // Add error to Redis
+            this._processMessage.apply(this, [message])
         });
+    }
+
+    _processMessage(message) {
+        const self = this;
+        this._latestMsgTime = +Date.now();
+        const sub = redis.createClient(config.redisPort[ENV]);
+
+        sub.multi().get(message).set(message, self.clientId).exec(function (err, resp) {
+            if (err) return errorHandler(err);
+            // Process only once
+            if (resp[0]) {
+                sub.discard();
+            } else {
+                let d = Math.random();
+                // 5% to error
+                if (d < 0.05) {
+                    // Add error to Redis
+                    self._writeError(message);
+                    console.log(`ERROR PROCESSED ${message} by #${self.clientId}`);
+                } else console.log(`PROCESSED ${message} by #${self.clientId}`);
+            }
+        });
+        sub.quit();
     }
 
     _writeError(message) {
