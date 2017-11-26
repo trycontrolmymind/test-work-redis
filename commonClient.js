@@ -1,7 +1,7 @@
 const config = require('./config'),
     ENV = process.env.NODE_ENV;
 const redis = require("redis");
-
+const errorHandler = require("./errorHandler");
 class Client {
     constructor() {
         this._clientNumber = Client.getRandomInt();
@@ -18,7 +18,7 @@ class Client {
     sendKeepalive() {
         const _client = this._createClient();
         _client.set("system.clients." + this._clientNumber, +Date.now(), "EX", 
-            config.keepAliveTimeout[ENV], 
+            Math.round(config.keepAliveTimeout[ENV]/1000), 
             (err, reply) => { if (err) return errorHandler(err); });
         _client.quit();
     }

@@ -61,3 +61,6 @@ typings/
 
 # Idea files
 .idea
+
+# VS Code files
+.vscode
