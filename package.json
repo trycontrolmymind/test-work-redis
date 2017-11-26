@@ -12,5 +12,36 @@
   "dependencies": {
     "redis": "^2.8.0",
     "lorem-ipsum": "^1.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.12.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "ecmaFeatures": {
+      "arrowFunctions": true,
+      "blockBindings": true,
+      "classes": true,
+      "defaultParameters": true,
+      "destructuring": true,
+      "forOf": true,
+      "generators": true,
+      "modules": true,
+      "objectLiteralComputedProperties": true,
+      "objectLiteralDuplicateProperties": true,
+      "objectLiteralShorthandMethods": true,
+      "objectLiteralShorthandProperties": true,
+      "regexUFlag": true,
+      "regexYFlag": true,
+      "restParams": true,
+      "spread": true,
+      "superInFunctions": true,
+      "templateStrings": true,
+      "unicodeCodePointEscapes": true,
+      "globalReturn": true
+    }
   }
 }

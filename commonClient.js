@@ -1,5 +1,5 @@
 const config = require('./config'),
-    ENV = process.env.NODE_ENV;
+    ENV = process.env.NODE_ENV || "dev";
 const redis = require("redis");
 const errorHandler = require("./errorHandler");
 
@@ -17,16 +17,23 @@ class Client {
         return Math.round(Math.random() * 100000)
     }
 
+    /**
+     * Set Redis system.client.#id => #id with expired time to know what client online now
+     */
     sendKeepalive() {
-        const _client = this._createClient();
-        _client.set("system.clients." + this._clientNumber, +Date.now(), "EX",
+        const client = this._createClient();
+        client.set("system.clients." + this._clientNumber, +Date.now(), "EX",
             Math.round(config.keepAliveTimeout[ENV] / 1000),
             (err, reply) => {
                 if (err) return errorHandler(err);
             });
-        _client.quit();
+        client.quit();
     }
 
+    /**
+     * Get all client's online
+     * @param {function} callback
+     */
     getAllClientsOnline(callback) {
         const _client = this._createClient();
         _client.keys("system.clients.*", function (err, reply) {
@@ -36,6 +43,11 @@ class Client {
         _client.quit();
     }
 
+    /**
+     * Find client with lowest id and return it to create new generator
+     * @param clients
+     * @return {number} clientId
+     */
     getNewGenerator(clients) {
         return Math.min.apply(null, clients.map((client) => {
             return parseInt(client.replace("system.clients.", ""));
