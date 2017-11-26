@@ -1,11 +1,13 @@
 {
   "name": "test-work-redis",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "debug_win": "SET NODE_ENV=dev&& nodemon index.js"
+    "serve": "nodemon index.js",
+    "start": "node index.js",
+    "getErors": "node index.js getErrors"
   },
   "author": "Yandimirkin V.",
   "license": "ISC",
@@ -14,7 +16,10 @@
     "lorem-ipsum": "^1.0.4"
   },
   "devDependencies": {
-    "eslint": "^4.12.0"
+    "chai": "^4.1.2",
+    "eslint": "^4.12.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^4.0.1"
   },
   "eslintConfig": {
     "env": {
