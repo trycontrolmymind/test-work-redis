@@ -54,6 +54,22 @@ class Client {
         }));
     }
 
+    /**
+     * Set Redis system.client.#id => #id with expired time to know what client online now
+     * @param {function} callback
+     */
+    static getErrors(callback) {
+        const client = redis.createClient(config.redisPort[ENV]);
+        client.multi()
+            .hgetall("system.errors")
+            .del("system.errors")
+            .exec((err, resp) => {
+                if (err) return errorHandler(err);
+                callback(resp[0])
+            });
+        client.quit();
+    }
+
     _createClient() {
         return redis.createClient(config.redisPort[ENV]);
     }

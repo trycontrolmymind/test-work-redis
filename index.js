@@ -6,9 +6,24 @@ const config = require('./config'),
 const redis = require("redis");
 const client = redis.createClient(config.redisPort[ENV]);
 const errorHandler = require("./errorHandler");
+const CommonClient = require("./commonClient");
+
+// if we running getErrors argument
+let getErrors = false;
+process.argv.forEach(function (val, index, array) {
+    if (val === "getErrors") {
+        getErrors = true;
+        CommonClient.getErrors(function (resp) {
+            console.log(resp);
+            process.exit();
+        })
+    }
+});
+if(getErrors) return;
+
 const generatorMode = require("./generatorMode"),
-    CommonClient = require("./commonClient"),
     WorkerMode = require("./workerMode");
+
 const commonClient = new CommonClient();
 const CLIENT_ID = commonClient.clientNumber;
 
