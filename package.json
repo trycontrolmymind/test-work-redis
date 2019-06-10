@@ -12,8 +12,9 @@
   "author": "Yandimirkin V.",
   "license": "ISC",
   "dependencies": {
-    "redis": "^2.8.0",
-    "lorem-ipsum": "^1.0.4"
+    "dotenv": "^8.0.0",
+    "lorem-ipsum": "^1.0.4",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
